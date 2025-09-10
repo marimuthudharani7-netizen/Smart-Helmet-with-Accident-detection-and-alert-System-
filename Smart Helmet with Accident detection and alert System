@@ -1,0 +1,35 @@
+DISCRIPTION:
+A Smart Helmet with accident detection uses sensors like accelerometer & vibration sensor to detect crashes and sends an alert via GSM module to emergency contacts. It ensures rider safety by providing real-time monitoring.
+CODING:
+#include <SoftwareSerial.h>
+
+SoftwareSerial gsm(9, 10); // RX, TX for GSM module
+int vibrationPin = 2;      
+int accident = 0;
+
+void setup() {
+  pinMode(vibrationPin, INPUT);
+  gsm.begin(9600);
+  Serial.begin(9600);
+  delay(1000);
+}
+
+void loop() {
+  accident = digitalRead(vibrationPin);
+
+  if (accident == HIGH) {
+    Serial.println("Accident Detected!");
+    sendAlert();
+    delay(5000); // Avoid multiple alerts
+  }
+}
+
+void sendAlert() {
+  gsm.println("AT+CMGF=1"); // Text mode
+  delay(1000);
+  gsm.println("AT+CMGS=\"+911234567890\""); // Replace with emergency number
+  delay(1000);
+  gsm.println("Accident detected! Please help immediately."); 
+  gsm.write(26); // Ctrl+Z to send SMS
+  delay(1000);
+}
